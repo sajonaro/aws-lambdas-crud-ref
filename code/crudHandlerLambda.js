@@ -86,16 +86,24 @@ async function createProduct(product) {
         });
 }
 
-async function getProducts(prodId) {
-    const params = {
-        TableName: tableName,
-        Key: {
-            'prodId': prodId
+async function scanDynamoRecords(scanParams, itemArray){
+    try{
+        const dynamoData = await dynamoDb.scan(scanParams).promise();
+        itemArray = itemArray.concat(dynamoData.Items);
+        if(dynamoData.LastEvaluatedKey){
+            scanParams.ExclusiveStartKey = dynamoData.LastEvaluatedKey;
+            return await scanDynamoRecords(scanParams, itemArray);
         }
-    };
+        return itemArray;
+    } catch(err){
+        console.log(err);
+        return null;}
+    }
 
+
+async function getProducts(prodId) {
     if (prodId === undefined) {
-        return await dynamoDb.scan({ TableName: tableName }).promise()
+        return await scanDynamoRecords({ TableName: tableName }, []).promise()
             .then(data => {
                 return buildResponse(200, data.Items);
             })
@@ -105,6 +113,12 @@ async function getProducts(prodId) {
             });
     }
 
+    const params = {
+        TableName: tableName,
+        Key: {
+            'prodId': prodId
+        }
+    };
     return await dynamoDb.get(params).promise()
         .then(data => {
             return buildResponse(200, data.Item);

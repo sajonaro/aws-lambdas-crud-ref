@@ -6,7 +6,7 @@ networks:
 
 volumes:
     tfdata_vol:
-    localstack_vol:
+    localstack_vol:   
 
 services:
 
@@ -16,10 +16,9 @@ services:
     env_file:
       - .env
     environment:
-      - SERVICES=eks,iam,sts,cloudwatch,ec2
+      - SERVICES=iam,sts,cloudwatch,apigateway,dynamodb,lambda,route53 
       - DEBUG=3
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
-      - LAMBDA_EXECUTOR=docker
       # use this flag if PRO token is not available
       - ACTIVATE_PRO=0
       - DOCKER_HOST=unix:///var/run/docker.sock
@@ -34,17 +33,19 @@ services:
     volumes:
       - localstack_vol:/var/lib/localstack/
       - "/var/run/docker.sock:/var/run/docker.sock"
+   
 
 
-  terraform:
+  terraform-container:
     # image tag isused to bind to a specific version of terraform
-    image: hashicorp/terraform:1.7.1
+    image: hashicorp/terraform:1.8.0
     container_name: terraform
     networks:
       - eks-net
     volumes:
       - tfdata_vol:/tfdata
-      - .:/infrastructure
+      - ./infrastructure:/infrastructure
+      - ./code:/code
     working_dir: /infrastructure
     environment:
       - TF_DATA_DIR=/tfdata

@@ -1,4 +1,4 @@
-# aws-lambdas-crud-ref
+### What are we building here:
 very basic but complete reference implementation of CRUD app using : 
 - AWS API gateway
 - AWS lambda
@@ -6,11 +6,13 @@ very basic but complete reference implementation of CRUD app using :
 - [terraform](https://www.terraform.io/ )
 - [localstack](https://www.localstack.cloud/)
 
+## ok, but how does it look?
 
+![img](./design/CRUD_lambda.png)
 
-## To run (locally)
+### How can I deploy and run it ?
 
-STEP 1 : define & deploy infrastructure
+#### deploy locally:
 
 - run localstack container via docker compose
 
@@ -31,5 +33,10 @@ docker compose -f  docker-compose.yml run --rm terraform-container plan -var-fil
 docker compose -f  docker-compose.yml run --rm terraform-container apply -var-file terraform.tfvars -auto-approve 
 
 ```
+- API should be available via http://[api-gateway-generated-by_terraform]/product, the value of [api-gateway-generated-by_terraform] is provided as output from terraform module api_gateway
 
-STEP 2 : run the application
+#### deploy to real AWS environment:
+ - update .env file to include real values (vs those included by default, targeted at localstack based deployment)
+ - no need to stand up docker compose stack
+ - just use terraform commands described above (first init, then apply)
+ - use url generated for API to access product API

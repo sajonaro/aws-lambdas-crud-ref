@@ -1,10 +1,10 @@
-resource "aws_lambda_function" "crud_lambda" {
-  filename         = "index.zip"
-  function_name    = var.function_name
+resource "aws_lambda_function" "php-lambda" {
+  function_name    = "php-app"
   role             = aws_iam_role.lambda_role.arn
-  handler          = "index.handler"
-  runtime          = "nodejs14.x"
-  source_code_hash = data.archive_file.lambda_package.output_base64sha256
+  handler          = "index"
+  image_uri        =  var.image_url
+  package_type     =  "Image"
+
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -27,19 +27,4 @@ resource "aws_iam_role" "lambda_role" {
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   role       = aws_iam_role.lambda_role.name
-}
-
-resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.crud_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/*"
-}
-
-data "archive_file" "lambda_package" {
-  type        = "zip"
-  source_file = "../code/crudHandlerLambda.js"
-  output_path = "index.zip"
 }

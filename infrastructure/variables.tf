@@ -4,11 +4,17 @@ variable "region" {
 }
 
 variable "app_name" {
-
+  default = "php-app"
 }
 
 variable "tag" {
+  default = "1.0.0"
 
+}
+
+variable "image_url" {
+ 
+  
 }
 
 
@@ -43,6 +49,6 @@ variable "root_path" {
 }
 
 variable "function_name" {
-  default = "crud_lambda"
+  default = "php_lambda"
 
 }
